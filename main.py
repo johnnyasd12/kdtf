@@ -2,9 +2,9 @@ import os
 import argparse
 import model
 import data
-import tensorflow as tf
 import numpy as np
 import random
+import tensorflow as tf
 
 seed = int(os.getenv("SEED", 12))
 tf.set_random_seed(seed)
@@ -84,7 +84,7 @@ def main():
             teacher_model.close_session()
         student_model.close_session()
     else:
-        teacher_model = model.BigModel(args, "teacher")
+        teacher_model = model.BigModel(args, "teacher") # BUGFIX: OOM error
         teacher_model.start_session()
         teacher_model.train(dataset)
 

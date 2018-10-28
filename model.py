@@ -1,5 +1,5 @@
-import tensorflow as tf
 import os
+import tensorflow as tf
 
 
 class BigModel:
@@ -135,7 +135,10 @@ class BigModel:
             self.merged_summary_op = mymergingfunction(self.model_type)
 
     def start_session(self):
-        self.sess = tf.Session()
+        # not to use all memory
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        self.sess = tf.Session(config = config)
 
     def close_session(self):
         self.sess.close()
