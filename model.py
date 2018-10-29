@@ -135,9 +135,17 @@ class BigModel:
             self.merged_summary_op = mymergingfunction(self.model_type)
 
     def start_session(self):
-        # not to use all memory
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
+        # not to use all memory ???
+        # config = tf.ConfigProto()
+        # config.gpu_options.allow_growth = True
+
+        # only use 1/3 of memory
+        fraction = 0.333
+        gpu_options = tf.GPUOptions(
+        	allow_growth=True
+        	,per_process_gpu_memory_fraction=fraction
+        	)
+        config = tf.ConfigProto(gpu_options=gpu_options)
         self.sess = tf.Session(config = config)
 
     def close_session(self):
@@ -327,8 +335,17 @@ class SmallModel:
 
     def start_session(self):
         # not to use all memory
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
+        # config = tf.ConfigProto()
+        # config.gpu_options.allow_growth = True
+        # self.sess = tf.Session(config = config)
+
+        # only use 1/3 of memory
+        fraction = 0.333
+        gpu_options = tf.GPUOptions(
+        	allow_growth=True
+        	,per_process_gpu_memory_fraction=fraction
+        	)
+        config = tf.ConfigProto(gpu_options=gpu_options)
         self.sess = tf.Session(config = config)
 
     def close_session(self):
