@@ -255,7 +255,7 @@ class SmallModel:
         self.X = tf.placeholder(tf.float32, [None, self.num_input], name="%s_%s" % (self.model_type, "xinput"))
         self.Y = tf.placeholder(tf.float32, [None, self.num_classes], name="%s_%s" % (self.model_type, "yinput"))
 
-        self.flag = tf.placeholder(tf.bool, None, name="%s_%s" % (self.model_type, "flag"))
+        self.flag = tf.placeholder(tf.bool, None, name="%s_%s" % (self.model_type, "flag")) # learning form teacher or not
         self.soft_Y = tf.placeholder(tf.float32, [None, self.num_classes], name="%s_%s" % (self.model_type, "softy"))
         self.softmax_temperature = tf.placeholder(tf.float32, name="%s_%s" % (self.model_type, "softmaxtemperature"))
 
@@ -326,7 +326,10 @@ class SmallModel:
             self.merged_summary_op = mymergingfunction(self.model_type)
 
     def start_session(self):
-        self.sess = tf.Session()
+        # not to use all memory
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        self.sess = tf.Session(config = config)
 
     def close_session(self):
         self.sess.close()
