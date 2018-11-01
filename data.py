@@ -1,3 +1,4 @@
+print(1)
 from tensorflow.examples.tutorials.mnist import input_data
 
 
@@ -17,3 +18,13 @@ class Dataset:
 
     def get_validation_data(self):
         return (self.mnist.validation.images, self.mnist.validation.labels)
+
+if __name__ == '__main__':
+    
+
+    mnist = input_data.read_data_sets('./',one_hot=True)
+    n_train = mnist.train._num_examples
+    mnist_train = mnist.train
+    print(type(mnist_train))
+    
+

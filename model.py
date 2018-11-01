@@ -224,11 +224,13 @@ class BigModel_re:
         self.num_steps = args.num_steps
         self.batch_size = args.batch_size
         self.display_step = args.display_step
+        self.n_hidden_1 = 1200
+        self.n_hidden_2 = 1200
         self.num_input = 784  # MNIST data input (img shape: 28*28)
         self.num_classes = 10
         self.dropoutprob = args.dropoutprob
         self.checkpoint_dir = args.checkpoint_dir
-        self.checkpoint_file = "bigmodel"
+        self.checkpoint_file = "bigmodel_re"
         self.temperature = args.temperature
         self.checkpoint_path = os.path.join(self.checkpoint_dir, self.checkpoint_file + ".ckpt")
         self.log_dir = os.path.join(args.log_dir, self.checkpoint_file)
