@@ -18,6 +18,8 @@ class BigModel:
         self.log_dir = os.path.join(args.log_dir, self.checkpoint_file)
         self.model_type = model_type
 
+        self.mem_fraction = 0.25
+
         # Store layers weight & bias
         self.weights = {
             # 5x5 conv, 1 input, 32 outputs
@@ -140,7 +142,7 @@ class BigModel:
         # config.gpu_options.allow_growth = True
 
         # only use 1/3 of memory
-        fraction = 0.333
+        fraction = self.mem_fraction
         gpu_options = tf.GPUOptions(
         	allow_growth=True
         	,per_process_gpu_memory_fraction=fraction
@@ -236,6 +238,8 @@ class SmallModel:
         self.max_checkpoint_path = os.path.join(self.checkpoint_dir, self.checkpoint_file + "max")
         self.log_dir = os.path.join(args.log_dir, self.checkpoint_file)
         self.model_type = model_type
+
+        self.mem_fraction = 0.25
 
         self.weights = {
             'h1': tf.Variable(tf.random_normal([self.num_input, self.n_hidden_1]),
@@ -340,7 +344,7 @@ class SmallModel:
         # self.sess = tf.Session(config = config)
 
         # only use 1/3 of memory
-        fraction = 0.333
+        fraction = self.mem_fraction
         gpu_options = tf.GPUOptions(
         	allow_growth=True
         	,per_process_gpu_memory_fraction=fraction
