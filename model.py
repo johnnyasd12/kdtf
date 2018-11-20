@@ -238,20 +238,22 @@ class BigModel_re:
 
         # Store layers weight & bias
         self.weights = {
-            # 5x5 conv, 1 input, 32 outputs
-            'wc1': tf.Variable(tf.random_normal([5, 5, 1, 32]), name="%s_%s" % (self.model_type, "wc1")),
-            # 5x5 conv, 32 inputs, 64 outputs
-            'wc2': tf.Variable(tf.random_normal([5, 5, 32, 64]), name="%s_%s" % (self.model_type, "wc2")),
+            # # 5x5 conv, 1 input, 32 outputs
+            # 'wc1': tf.Variable(tf.random_normal([5, 5, 1, 32]), name="%s_%s" % (self.model_type, "wc1")),
+            # # 5x5 conv, 32 inputs, 64 outputs
+            # 'wc2': tf.Variable(tf.random_normal([5, 5, 32, 64]), name="%s_%s" % (self.model_type, "wc2")),
             # fully connected, 7*7*64 inputs, 1024 outputs
-            'wd1': tf.Variable(tf.random_normal([7 * 7 * 64, 1024]), name="%s_%s" % (self.model_type, "wd1")),
+            'wd1': tf.Variable(tf.random_normal([28*28*1, 1200]), name="%s_%s" % (self.model_type, "wd1")),
+            'wd2': tf.Variable(tf.random_normal([1200, 1200]), name="%s_%s" % (self.model_type, "wd2")),
             # 1024 inputs, 10 outputs (class prediction)
-            'out': tf.Variable(tf.random_normal([1024, self.num_classes]), name="%s_%s" % (self.model_type, "out"))
+            'out': tf.Variable(tf.random_normal([1200, self.num_classes]), name="%s_%s" % (self.model_type, "out"))
         }
 
         self.biases = {
-            'bc1': tf.Variable(tf.random_normal([32]), name="%s_%s" % (self.model_type, "bc1")),
-            'bc2': tf.Variable(tf.random_normal([64]), name="%s_%s" % (self.model_type, "bc2")),
-            'bd1': tf.Variable(tf.random_normal([1024]), name="%s_%s" % (self.model_type, "bd1")),
+            # 'bc1': tf.Variable(tf.random_normal([32]), name="%s_%s" % (self.model_type, "bc1")),
+            # 'bc2': tf.Variable(tf.random_normal([64]), name="%s_%s" % (self.model_type, "bc2")),
+            'bd1': tf.Variable(tf.random_normal([1200]), name="%s_%s" % (self.model_type, "bd1")),
+            'bd2': tf.Variable(tf.random_normal([1200]), name="%s_%s" % (self.model_type, "bd2")),
             'out': tf.Variable(tf.random_normal([self.num_classes]), name="%s_%s" % (self.model_type, "out"))
         }
 
@@ -281,29 +283,32 @@ class BigModel_re:
         # MNIST data input is a 1-D vector of 784 features (28*28 pixels)
         # Reshape to match picture format [Height x Width x Channel]
         # Tensor input become 4-D: [Batch Size, Height, Width, Channel]
-        with tf.name_scope("%sinputreshape" % (self.model_type)), tf.variable_scope(
-                        "%sinputreshape" % (self.model_type)):
-            x = tf.reshape(self.X, shape=[-1, 28, 28, 1])
+        # with tf.name_scope("%sinputreshape" % (self.model_type)), tf.variable_scope(
+        #                 "%sinputreshape" % (self.model_type)):
+        #     x = tf.reshape(self.X, shape=[-1, 28, 28, 1])
 
         # Convolution Layer
-        with tf.name_scope("%sconvmaxpool" % (self.model_type)), tf.variable_scope("%sconvmaxpool" % (self.model_type)):
-            conv1 = self.conv2d(x, self.weights['wc1'], self.biases['bc1'])
-            # Max Pooling (down-sampling)
-            conv1 = self.maxpool2d(conv1, k=2)
+        # with tf.name_scope("%sconvmaxpool" % (self.model_type)), tf.variable_scope("%sconvmaxpool" % (self.model_type)):
+        #     conv1 = self.conv2d(x, self.weights['wc1'], self.biases['bc1'])
+        #     # Max Pooling (down-sampling)
+        #     conv1 = self.maxpool2d(conv1, k=2)
 
-            # Convolution Layer
-            conv2 = self.conv2d(conv1, self.weights['wc2'], self.biases['bc2'])
-            # Max Pooling (down-sampling)
-            conv2 = self.maxpool2d(conv2, k=2)
+        #     # Convolution Layer
+        #     conv2 = self.conv2d(conv1, self.weights['wc2'], self.biases['bc2'])
+        #     # Max Pooling (down-sampling)
+        #     conv2 = self.maxpool2d(conv2, k=2)
 
         # Fully connected layer
         # Reshape conv2 output to fit fully connected layer input
         with tf.name_scope("%sfclayer" % (self.model_type)), tf.variable_scope("%sfclayer" % (self.model_type)):
-            fc1 = tf.reshape(conv2, [-1, self.weights['wd1'].get_shape().as_list()[0]])
-            fc1 = tf.add(tf.matmul(fc1, self.weights['wd1']), self.biases['bd1'])
+            # fc1 = tf.reshape(conv2, [-1, self.weights['wd1'].get_shape().as_list()[0]])
+            fc1 = tf.add(tf.matmul(self.X, self.weights['wd1']), self.biases['bd1'])
             fc1 = tf.nn.relu(fc1)
+
+            fc2 = tf.add(tf.matmul(fc1, self.weights['wd2']), self.biases['bd2'])
+            fc2 = tf.nn.relu(fc2)
             # Apply Dropout
-            fc1 = tf.nn.dropout(fc1, self.keep_prob)
+            fc2 = tf.nn.dropout(fc2, keep_prob=0.7)
 
             # Output, class prediction
             logits = tf.add(tf.matmul(fc1, self.weights['out']), self.biases['out']) / self.softmax_temperature
